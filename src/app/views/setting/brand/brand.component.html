@@ -1,0 +1,250 @@
+<div class="breadcrumb">
+  <h1>Brand</h1>
+  <ul>
+    <li>
+      <a routerLink="/adjustment" routerLinkActive="router-link-active"
+        >Settings</a
+      >
+    </li>
+    <li>Brand</li>
+  </ul>
+</div>
+
+<div class="separator-breadcrumb border-top"></div>
+<div class="card">
+  <div class="div" style="margin: 25px">
+    <div style="display: flex; justify-content: space-between; width: 100%">
+      <div class="left" style="display: flex">
+        <div class="magnifying-glass"></div>
+        <div class="form-group">
+          <input
+            id="text"
+            placeholder="Search this table"
+            class="form-control"
+            style="background: #fff"
+            type="text"
+            [(ngModel)]="search"
+          />
+        </div>
+      </div>
+      <div>
+        <button
+          type="button"
+          class="btn btn-primary btn-rounded m-1"
+          (click)="open()"
+        >
+          <i class="i-Add"
+            ><span style="position: relative; bottom: 1px; margin-left: 3px"
+              >Create</span
+            ></i
+          >
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="vgt-selection-info-row clearfix" style="display:none;">
+    <span>{{deletedCount}} rows selected</span> 
+    <a href=""></a> 
+      <div class="vgt-selection-info-row__actions vgt-pull-right"><div>
+      <button class="btn btn-danger"(click)="DeleteMultipleBrand()">Delete</button>
+  </div>
+  </div>
+  </div>
+  <table class="table" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+    <thead>
+      <tr>
+        <th><input scope="col" type="checkbox" /></th>
+        <th scope="col" class="btn1" style="position: relative">Brand Image</th>
+        <th scope="col" class="btn1" style="position: relative">Brand Name</th>
+        <th scope="col" class="btn1" style="position: relative">
+          Brand Description
+        </th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let brand of brands | filter: search">
+        <td><input type="checkbox" /></td>
+        <td>
+          <img
+            [src]="brand.image"
+            alt="image"
+            width="50"
+            height="50"
+            class="img-thumbnail img-fluid"
+          />
+        </td>
+        <td>{{ brand.name }}</td>
+        <td>{{ brand.description }}</td>
+        <td>
+          <i
+            class="i-Edit text-success ml-2 text-25"
+            (click)="openEditModal(brand)"
+          ></i
+          ><i
+            class="i-Close-Window ml-2 text-danger text-25"
+            (click)="delete(brand)"
+          ></i>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <div
+    class="lower"
+    style="display: flex; justify-content: space-between; margin: 25px"
+  >
+    <div class="left">
+      <label
+        for="vgt-select-rpp-505333257072"
+        style="font-size: 14px; color: #909399"
+        class="footer__row-count__label"
+        >Rows per page:</label
+      >
+      <select
+        id="vgt-select-rpp-505333257072"
+        autocomplete="off"
+        name="perPageSelect"
+        aria-controls="vgt-table"
+        style="
+          background-color: transparent;
+          width: auto;
+          padding: 0;
+          border: 0;
+          border-radius: 0;
+          height: auto;
+          font-size: 14px;
+          margin-left: 8px;
+          color: #606266;
+          font-weight: 700;
+          -webkit-appearance: auto !important;
+          -moz-appearance: auto !important;
+          appearance: auto !important;
+        "
+        class="footer__row-count__select"
+      >
+        <option value="10">10</option>
+        <option value="20">20</option>
+        <option value="30">30</option>
+        <option value="40">40</option>
+        <option value="50">50</option>
+        <option value="4">All</option>
+      </select>
+    </div>
+    <div class="right">
+      <div class="footer__navigation">
+        <div class="footer__navigation__page-info">
+          <div>1 - 4 of 4</div>
+        </div>
+        <button
+          type="button"
+          aria-controls="vgt-table"
+          class="footer__navigation__page-btn disabled"
+          style="
+            background: 0 0;
+            border: none;
+            text-decoration: none;
+            color: #606266;
+            font-weight: 700;
+            white-space: nowrap;
+            vertical-align: middle;
+          "
+        >
+          <span aria-hidden="true" class="chevron left"></span>
+          <span>prev</span>
+        </button>
+        <button
+          type="button"
+          style="
+            background: 0 0;
+            border: none;
+            text-decoration: none;
+            color: #606266;
+            font-weight: 700;
+            white-space: nowrap;
+            vertical-align: middle;
+          "
+          aria-controls="vgt-table"
+          class="footer__navigation__page-btn disabled"
+        >
+          <span>next</span>
+          <span aria-hidden="true" class="chevron right"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<app-loaders *ngIf="isLoader"></app-loaders>
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">
+      {{ toggle ? "Edit" : "Create" }}
+    </h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="form-group">
+        <label for="code">Brand Name</label>
+        <input
+          type="text"
+          class="form-control"
+          id="Name"
+          placeholder="Name"
+          formControlName="name"
+        />
+        <errors [control]="f.name" [isSubmit]="isSubmitted"></errors>
+      </div>
+      <div class="form-group">
+        <label for="code">Brand Description</label>
+        <input
+          type="text"
+          class="form-control"
+          id="code"
+          placeholder="Description"
+          formControlName="description"
+        />
+      </div>
+      <div class="form-group">
+        <label for="code">Brand image</label>
+        <input
+          type="file"
+          (click)="$event.target.value = null"
+          (change)="patchImage($event)"
+        />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-outline-dark btn-rounded"
+      (click)="update()"
+      *ngIf="toggle"
+    >
+      Update
+    </button>
+    <button
+      type="button"
+      class="btn btn-outline-dark btn-rounded"
+      (click)="onSubmit()"
+      *ngIf="!toggle"
+    >
+      Submit
+    </button>
+    <button
+      type="button"
+      class="btn btn-outline-dark btn-rounded"
+      (click)="modal.close('ok')"
+    >
+      Cancel
+    </button>
+  </div>
+</ng-template>

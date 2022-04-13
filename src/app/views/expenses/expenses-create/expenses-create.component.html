@@ -1,0 +1,114 @@
+<div class="breadcrumb">
+  <h1>{{ "EXPENSES.CREATE" | translate }}</h1>
+  <ul>
+    <li>
+      <a routerLink="/expenses" routerLinkActive="router-link-active">{{
+        "EXPENSES.NAME" | translate
+      }}</a>
+    </li>
+    <li>{{ "EXPENSES.CREATE" | translate }}</li>
+  </ul>
+</div>
+
+<div class="separator-breadcrumb border-top"></div>
+<form class="row" [formGroup]="form">
+  <div class="col-md-12">
+    <div class="card mb-4" style="display: flex">
+      <div style="display: flex; flex-direction: row" class="mt-2">
+        <div class="col-md-4 form-group mb-3">
+          <label for="picker1">{{ "COMMON.DATE" | translate }}</label>
+          <div class="input-group">
+            <input
+              id="picker1"
+              class="form-control"
+              placeholder="yyyy-mm-dd"
+              style="background: #f3f4f6"
+              name="dp"
+              ngbDatepicker
+              #dp="ngbDatepicker"
+              [value]="today | date"
+              (dateSelect)="onDateSelect($event)"
+            />
+            <div class="input-group-append">
+              <button
+                class="btn btn-secondary"
+                (click)="dp.toggle()"
+                type="button"
+              >
+                <i class="icon-regular i-Calendar-4"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 form-group mb-3">
+          <label for="picker1"> {{ "COMMON.CHOOSE" | translate }}</label>
+          <ng-select
+            class="ngSelectCustom"
+            [items]="warehouses"
+            bindLabel="name"
+            bindValue="id"
+            placeholder="Warehouse"
+            autocomplete="off"
+            formControlName="warehouse_id"
+          ></ng-select>
+          <errors [control]="f.warehouse_id" [isSubmit]="isSubmitted"></errors>
+        </div>
+
+        <div class="col-md-4 form-group mb-3">
+          <label for="picker1">{{ "COMMON.CATEGORY" | translate }}</label>
+          <ng-select
+            class="ngSelectCustom"
+            [items]="expenseCategories"
+            bindLabel="name"
+            bindValue="id"
+            placeholder="Category"
+            autocomplete="off"
+            formControlName="expense_category_id"
+          ></ng-select>
+          <errors
+            [control]="f.expense_category_id"
+            [isSubmit]="isSubmitted"
+          ></errors>
+        </div>
+      </div>
+      <div>
+        <div style="display: flex; flex-direction: row">
+          <div class="col-md-4">
+            <label for="comment">{{ "COMMON.AMOUNT" | translate }}</label>
+
+            <input
+              type="text"
+              style="background: #f3f4f6"
+              placeholder="Search by Product code or name"
+              class="form-control mb-2 ml-1 mr-1"
+              formControlName="amount"
+              appNumericOnly
+            />
+            <errors [control]="f.amount" [isSubmit]="isSubmitted"></errors>
+          </div>
+          <div class="area col-md-12">
+            <div class="form-group" style="margin: 10px">
+              <label for="comment">{{ "COMMON.DETAIL" | translate }}:</label>
+              <textarea
+                class="form-control"
+                placeholder="A Few Word"
+                rows="5"
+                style="background: #f3f4f6"
+                id="comment"
+                formControlName="details"
+              ></textarea>
+              <errors [control]="f.details" [isSubmit]="isSubmitted"></errors>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="submit mb-5 ml-4">
+        <button type="button" class="btn btn-primary" (click)="onSubmit()">
+          {{ "PRODUCT.SUBMIT" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+<app-loaders *ngIf="isLoader"></app-loaders>

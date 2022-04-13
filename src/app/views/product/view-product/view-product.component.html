@@ -1,0 +1,339 @@
+<div class="breadcrumb">
+  <h1>{{ "PRODUCT.LIST" | translate }}</h1>
+  <ul>
+    <li>
+      <a routerLink="/transfer" routerLinkActive="router-link-active">Products</a>
+    </li>
+    <li>{{ "PRODUCT.LIST" | translate }}</li>
+  </ul>
+</div>
+
+<div class="separator-breadcrumb border-top"></div>
+<div class="div">
+  <div style="display: flex; justify-content: space-between; width: 100%">
+    <div class="left" style="display: flex">
+      <div class="magnifying-glass"></div>
+      <div class="form-group">
+        <input placeholder="Search this table" 
+          class="form-control" 
+          style="background: #fff" 
+          type="text"
+          [(ngModel)]="search" />
+      </div>
+    </div>
+    <div>
+      <button type="button" class="btn btn-outline-info m-1 collapsed" (click)="open(mymodal)"
+        style="overflow-anchor: none;">
+        <i class="i-Filter-2"></i>{{ "COMMON.FILTER" | translate }}
+      </button>
+
+      <button type="button" class="btn btn-outline-success m-1" (click)="printPDF()">
+        <i class="i-File-Copy"></i> {{ "COMMON.PDF" | translate }}
+      </button>
+      <button type="button" class="btn btn-outline-danger m-1" (click)="printExcel()">
+        <i class="i-File-Excel"></i> {{ "COMMON.EXCEL" | translate }}
+      </button>
+      <!-- <button type="button" class="btn btn-info" (click)="onImportClick()">
+        <i class="i-Download" style="margin-right: 7px"></i>{{ "COMMON.IMPORT" | translate }}
+        <input type="file" class="d-none" (change)="onChange($event)"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          #inputFile />
+      </button> -->
+      <button type="button" class="btn btn-info collapsed" (click)="onImportClick(mymodalImportProduct)" style="overflow-anchor: none;">
+        <i class="i-Download" style="margin-right: 7px"></i>{{ "COMMON.IMPORT" | translate }}
+        <input type="file" class="d-none" (change)="onChange($event)"
+          accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+          #inputFile />
+      </button>
+
+      <button type="button" class="btn btn-primary m-1" [routerLink]="['/product/add']"
+        routerLinkActive="router-link-active">
+        <i class="i-Add"><span style="position: relative; bottom: 1px; margin-left: 3px">{{
+            "COMMON.CREATE" | translate
+            }}</span></i>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="vgt-selection-info-row clearfix" style="display:none;">
+  <span>{{deletedCount}} rows selected</span> 
+  <a href=""></a> 
+    <div class="vgt-selection-info-row__actions vgt-pull-right"><div>
+    <button class="btn btn-danger"(click)="DeleteMultipleProducts()">Delete</button>
+</div>
+</div>
+</div>
+
+<table class="table" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+  <thead>
+    <tr>
+      <th scope="col">
+        <input type="checkbox" (change)="checkAll($event.target.checked)" />
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "PRODUCT.IMAGE" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "PRODUCT.NAME" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "PRODUCT.CODE" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "PRODUCT.CATEGORY" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "PRODUCT.BRAND" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "PRODUCT.PRICE" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "PRODUCT.UNIT" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "PRODUCT.QUANTITY" | translate }}
+      </th>
+      <th scope="col">{{ "PRODUCT.ACTION" | translate }}</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngIf="products.length === 0">
+      <td colspan="10">
+        <div style="color: #909399; text-align: center" class="vgt-center-align vgt-text-disabled">
+          No data for table
+        </div>
+      </td>
+    </tr>
+    <tr *ngFor="let product of products | filter: search; let i = index">
+      <td scope="col">
+        <input type="checkbox" [checked]="product.checkbox" (change)="checkSingle(i)" />
+      </td>
+      <td>
+        <img [src]="getPrimaryImage(product)" style="height: 50px; width: 50px" alt="no image" />
+      </td>
+      <td>{{ product.name }}</td>
+      <td>{{ product.code }}</td>
+      <td>{{ product.category_id | Category | async }}</td>
+      <td>{{ product.brand_id | Brand | async }}</td>
+      <td>{{ product.price }}</td>
+      <td>{{ product.unit_id }}</td>
+      <td>{{ product.stock_alert }}</td>
+
+      <td>
+        <i class="i-Eye text-info text-25"></i><i class="i-Edit text-success ml-2 text-25"
+          [routerLink]="['/product/edit', product.id]"></i><i class="i-Close-Window ml-2 text-danger text-25"
+          (click)="delete(product)"></i>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<!--Filter region Begion-->
+<div tabindex="-1" class="b-sidebar-outer">
+  <!---->
+  <ng-template #mymodal let-modal>
+
+    <header class="b-sidebar-header"> <button type="button" class="close" type="button" class="close" aria-label="Close"
+        (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true"><svg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img"
+            aria-label="x" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi-x b-icon bi">
+            <g>
+              <path
+                d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z">
+              </path>
+            </g>
+          </svg></span>
+      </button><strong id="sidebar-right___title__">Filter</strong></header>
+    <div class="b-sidebar-body">
+      <div class="px-3 py-2">
+        <div class="row">
+          <div class="col-md-12">
+            <fieldset class="form-group" id="__BVID__152">
+              <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__152__BV_label_">Code
+                Product</legend>
+              <div>
+                <input type="text" name="search" [(ngModel)]="searchCode" placeholder="Search by Code"
+                  class="form-control" label="Code Product" id="__BVID__153">
+
+              </div>
+            </fieldset>
+          </div>
+          <div class="col-md-12">
+            <fieldset class="form-group" id="__BVID__154">
+              <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__154__BV_label_">Product
+              </legend>
+              <div>
+                <input type="text" name="search" [(ngModel)]="searchName" placeholder="Search by Name"
+                  class="form-control" label="Name Product" id="__BVID__155">
+                <!---->
+                <!---->
+                <!---->
+              </div>
+            </fieldset>
+          </div>
+          <div class="col-md-12">
+            <fieldset class="form-group" id="__BVID__156">
+              <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__156__BV_label_">Category
+              </legend>
+              <div>
+                <div dir="auto" class="v-select vs--single vs--searchable">
+                  <select class="form-control" id="pCategory" name="pCategory" required [(ngModel)]='optionSelected'
+                   >
+                    <option *ngFor="let cat of category" value="{{cat.id}}">{{cat.name}}</option>
+                  </select>
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="10" role="presentation"
+                    class="vs__open-indicator">
+                    <path
+                      d="M9.211364 7.59931l4.48338-4.867229c.407008-.441854.407008-1.158247 0-1.60046l-.73712-.80023c-.407008-.441854-1.066904-.441854-1.474243 0L7 5.198617 2.51662.33139c-.407008-.441853-1.066904-.441853-1.474243 0l-.737121.80023c-.407008.441854-.407008 1.158248 0 1.600461l4.48338 4.867228L7 10l2.211364-2.40069z">
+                    </path>
+                  </svg>
+                </div>
+              </div>
+            </fieldset>
+          </div>
+          <div class="col-md-12">
+            <fieldset class="form-group" id="__BVID__161">
+              <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__161__BV_label_">Brand
+              </legend>
+             
+                <div dir="auto" class="v-select vs--single vs--searchable">
+                  <select class="form-control" id="pBrand" name="pBrand" [(ngModel)]="selectedBrand">
+                    <option *ngFor="let item of brand" value="{{item.id}}">{{item.name}}</option>
+                    </select>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="10" role="presentation"
+                      class="vs__open-indicator">
+                      <path
+                        d="M9.211364 7.59931l4.48338-4.867229c.407008-.441854.407008-1.158247 0-1.60046l-.73712-.80023c-.407008-.441854-1.066904-.441854-1.474243 0L7 5.198617 2.51662.33139c-.407008-.441853-1.066904-.441853-1.474243 0l-.737121.80023c-.407008.441854-.407008 1.158248 0 1.600461l4.48338 4.867228L7 10l2.211364-2.40069z">
+                      </path>
+                    </svg>
+                </div>
+            </fieldset>
+          </div>
+          <div class="col-sm-12 col-md-6">
+            <button type="button" class="btn btn-primary m-1 btn-block" (click)="getFilteredData($event)"><i
+                class="i-Filter-2"></i> Filter </button>
+          </div>
+          <div class="col-sm-12 col-md-6">
+            <button type="button" class="btn btn-danger m-1 btn-block" (click)="ResetProductData($event)"><i
+                class="i-Power-2"></i> Reset </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!---->
+  </ng-template>
+  <!---->
+  <!---->
+</div>
+
+<ng-template #mymodalImportProduct let-modal>
+  <div class="modal-dialog modal-md">
+    <span tabindex="0"></span>
+    <div id="importProducts___BV_modal_content_" tabindex="-1" class="modal-content">
+      <header id="importProducts___BV_modal_header_" class="modal-header">
+        <h5 id="importProducts___BV_modal_title_" class="modal-title">Import products</h5>
+        <button type="button" aria-label="Close" class="close" aria-label="Close"
+        (click)="modal.dismiss('Cross click')">×</button>
+      </header>
+      <div id="importProducts___BV_modal_body_" class="modal-body">
+        <form enctype="multipart/form-data" class="">
+          <div class="row">
+            <div class="mb-3 col-sm-12 col-md-12">
+              <fieldset class="form-group" id="__BVID__154">
+                <!---->
+                <div>
+                  <input type="file" label="Choose File">
+                  <div id="File-feedback" class="d-block invalid-feedback">Field must be in csv format</div>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+              </fieldset>
+            </div>
+            <div class="col-sm-12 col-md-6">
+              <button type="submit" class="btn btn-primary btn-sm btn-block">Submit</button>
+              <!---->
+            </div>
+            <div class="col-sm-12 col-md-6">
+              <a href="/import/exemples/import_products.csv" target="_self" class="btn btn-info btn-sm btn-block">Download example</a>
+            </div>
+            <div class="col-sm-12 col-md-12">
+              <table class="table table-bordered table-sm mt-4">
+                <tbody>
+                  <tr>
+                    <td>Name</td>
+                    <th>
+                      <span class="badge badge-outline-success">This Field is required</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td>Code Product</td>
+                    <th>
+                      <span class="badge badge-outline-success">This Field is required</span> code must be not exist already
+                    </th>
+                  </tr>
+                  <tr>
+                    <td>Category</td>
+                    <th>
+                      <span class="badge badge-outline-success">This Field is required</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td>Product Cost</td>
+                    <th>
+                      <span class="badge badge-outline-success">This Field is required</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td>Product Price</td>
+                    <th>
+                      <span class="badge badge-outline-success">This Field is required</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td>Product Unit</td>
+                    <th>
+                      <span class="badge badge-outline-success">This Field is required</span> unit must already be created Please use short name of unit
+                    </th>
+                  </tr>
+                  <tr>
+                    <td>Brand</td>
+                    <th>
+                      <span class="badge badge-outline-info">Field optional</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td>Stock Alert</td>
+                    <th>
+                      <span class="badge badge-outline-info">Field optional</span>
+                    </th>
+                  </tr>
+                  <tr>
+                    <td>Note</td>
+                    <th>
+                      <span class="badge badge-outline-info">Field optional</span>
+                    </th>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </form>
+      </div>
+      <footer id="importProducts___BV_modal_footer_" class="modal-footer">
+        <!---->
+        <button type="button" class="btn btn-primary" (click)="modal.dismiss('Cross click')">Cancel</button>
+        </footer>
+    </div>
+    <span tabindex="0"></span>
+  </div>
+  <!---->
+</ng-template>
+
+
+<!--Filter region End-->
+<app-pagination [pageNumber]="pageNumber" [pageSize]="pageSize" [total]="total"
+  (pageChangeEvent)="getProductList($event)"></app-pagination>
+<app-loaders *ngIf="isLoader"></app-loaders>

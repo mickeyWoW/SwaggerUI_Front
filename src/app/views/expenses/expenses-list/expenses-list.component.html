@@ -1,0 +1,313 @@
+<div class="breadcrumb">
+  <h1>{{ "EXPENSES.LIST" | translate }}</h1>
+  <ul>
+    <li>
+      <a routerLink="/expenses" routerLinkActive="router-link-active"
+        >{{ "EXPENSES.NAME" | translate }}
+      </a>
+    </li>
+    <li>{{ "EXPENSES.LIST" | translate }}</li>
+  </ul>
+</div>
+
+<div class="separator-breadcrumb border-top"></div>
+<div class="div">
+  <div style="display: flex; justify-content: space-between; width: 100%">
+    <div class="left" style="display: flex">
+      <div class="magnifying-glass"></div>
+      <div class="form-group">
+        <input placeholder="Search this table"
+          class="form-control"
+          style="background: #fff"
+          type="text"
+          [(ngModel)]="search"
+        />
+      </div>
+    </div>
+    <div>
+      <button type="button" class="btn btn-outline-primary m-1" (click)="open(mymodal)">
+        <i class="i-Filter-2"></i>{{ "COMMON.FILTER" | translate }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-success m-1"
+        (click)="printPDF()"
+      >
+        <i class="i-File-Copy"></i> {{ "COMMON.PDF" | translate }}
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-danger m-1"
+        (click)="printExcel()"
+      >
+        <i class="i-File-Excel"></i> {{ "COMMON.EXCEL" | translate }}
+      </button>
+
+      <button
+        type="button"
+        class="btn btn-primary m-1"
+        [routerLink]="['/expenses/add']"
+        routerLinkActive="router-link-active"
+      >
+        <i class="i-Add">{{ "COMMON.CREATE" | translate }}</i>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="vgt-selection-info-row clearfix" style="display:none;">
+  <span>{{deletedCount}} rows selected</span> 
+  <a href=""></a> 
+    <div class="vgt-selection-info-row__actions vgt-pull-right"><div>
+    <button class="btn btn-danger"(click)="DeleteMultipleExpense()">Delete</button>
+</div>
+</div>
+</div>
+<div class="vgt-selection-info-row clearfix" style="display:none;">
+  <span>{{deletedCount}} rows selected</span> 
+  <a href=""></a> 
+    <div class="vgt-selection-info-row__actions vgt-pull-right"><div>
+    <button class="btn btn-danger"(click)="DeleteMultipleExpense()">Delete</button>
+</div>
+</div>
+</div>
+<table class="table mt-4" id="htmlData" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+  <thead>
+    <tr>
+      <th scope="col"> 
+        <input type="checkbox" (change)="checkAll($event.target.checked)" />
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "COMMON.DATE" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "COMMON.REFERNCE" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "COMMON.DETAILS" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "COMMON.AMOUNT" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "COMMON.CATEGORY" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "COMMON.WAREHOUSE" | translate }}
+      </th>
+      <th scope="col" class="btn1" style="position: relative">
+        {{ "COMMON.ACTION" | translate }}
+      </th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngIf="expenses.length === 0">
+      <td colspan="6">
+        <div
+          style="color: #909399; text-align: center"
+          class="vgt-center-align vgt-text-disabled"
+        >
+          No data for table
+        </div>
+      </td>
+    </tr>
+    <tr *ngFor="let expense of expenses | filter: search; let i = index">
+      <th scope="col">
+        <input
+          type="checkbox"
+          [checked]="expense.checkbox"
+          (change)="checkSingle(i)"
+        />
+      </th>
+      <td>{{ expense.date | date }}</td>
+      <td>{{ expense.ref }}</td>
+      <td>{{ expense.details }}</td>
+      <td>{{ expense.amount }}</td>
+      <td>{{ expense.expense_category_id | Category | async }}</td>
+      <td>{{ expense.warehouse_id | Warehouse | async }}</td>
+      <td>
+        <i
+          class="i-Edit text-success ml-2 text-25"
+          [routerLink]="['/expenses/edit', expense.id]"
+        ></i
+        ><i
+          class="i-Close-Window ml-2 text-danger text-25"
+          (click)="delete(expense)"
+        ></i>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="lower" style="display: flex; justify-content: space-between">
+  <div class="left">
+    <label
+      for="vgt-select-rpp-505333257072"
+      style="font-size: 14px; color: #909399"
+      class="footer__row-count__label"
+      >{{ "COMMON.ROWS" | translate }}</label
+    >
+    <select
+      id="vgt-select-rpp-505333257072"
+      autocomplete="off"
+      name="perPageSelect"
+      aria-controls="vgt-table"
+      style="
+        background-color: transparent;
+        width: auto;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        height: auto;
+        font-size: 14px;
+        margin-left: 8px;
+        color: #606266;
+        font-weight: 700;
+        -webkit-appearance: auto !important;
+        -moz-appearance: auto !important;
+        appearance: auto !important;
+      "
+      class="footer__row-count__select"
+    >
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="30">30</option>
+      <option value="40">40</option>
+      <option value="50">50</option>
+      <option value="4">All</option>
+    </select>
+  </div>
+  <div class="right">
+    <div class="footer__navigation">
+      <div class="footer__navigation__page-info">
+        <div>1 - 4 of 4</div>
+      </div>
+      <button
+        type="button"
+        aria-controls="vgt-table"
+        class="footer__navigation__page-btn disabled"
+        style="
+          background: 0 0;
+          border: none;
+          opacity: 0.5;
+          text-decoration: none;
+          color: #606266;
+          font-weight: 700;
+          white-space: nowrap;
+          vertical-align: middle;
+        "
+      >
+        <span aria-hidden="true" class="chevron left"></span>
+        <span>{{ "COMMON.PREV" | translate }}</span>
+      </button>
+      <button
+        type="button"
+        style="
+          background: 0 0;
+          border: none;
+          text-decoration: none;
+          color: #606266;
+          font-weight: 700;
+          opacity: 0.5;
+          white-space: nowrap;
+          vertical-align: middle;
+        "
+        aria-controls="vgt-table"
+        class="footer__navigation__page-btn disabled"
+      >
+        <span>{{ "COMMON.NEXT" | translate }}</span>
+        <span aria-hidden="true" class="chevron right"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div tabindex="-1" class="b-sidebar-outer">
+	<!---->
+  <ng-template #mymodal let-modal>
+		<header class="b-sidebar-header">
+			<button type="button" aria-label="Close" class="close text-dark"  (click)="modal.dismiss('Cross click')">
+				<svg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="x" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi-x b-icon bi">
+					<g>
+						<path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path>
+					</g>
+				</svg>
+			</button><strong id="sidebar-right___title__">Filter</strong></header>
+		<div class="b-sidebar-body">
+			<div class="px-3 py-2">
+				<div class="row">
+					<div class="col-md-12">
+						<fieldset class="form-group" id="__BVID__95">
+							<legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__95__BV_label_">Date</legend>
+							<div>
+								<input type="date" class="form-control" id="__BVID__96">
+								<!---->
+								<!---->
+								<!---->
+							</div>
+						</fieldset>
+					</div>
+					<div class="col-md-12">
+						<fieldset class="form-group" id="__BVID__97">
+							<legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__97__BV_label_">Reference</legend>
+							<div>
+								<input type="text" placeholder="Reference" class="form-control" label="Reference" id="__BVID__98">
+								<!---->
+								<!---->
+								<!---->
+							</div>
+						</fieldset>
+					</div>
+					<div class="col-md-12">
+						<fieldset class="form-group" id="__BVID__99">
+							<legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__99__BV_label_">Warehouse</legend>
+							<div>
+								<div dir="auto" class="v-select vs--single vs--searchable">
+                  <select class="form-control" id="pCategory" name="pCategory" required [(ngModel)]='optionSelectedwarehouse'>
+                  <!-- <option value="Warehouse" selected>--Warehouse--</option> -->
+                  <option *ngFor="let war of warehouseData" value="{{war.id}}">{{war.name}}</option>
+                </select>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="10" role="presentation" class="vs__open-indicator"><path d="M9.211364 7.59931l4.48338-4.867229c.407008-.441854.407008-1.158247 0-1.60046l-.73712-.80023c-.407008-.441854-1.066904-.441854-1.474243 0L7 5.198617 2.51662.33139c-.407008-.441853-1.066904-.441853-1.474243 0l-.737121.80023c-.407008.441854-.407008 1.158248 0 1.600461l4.48338 4.867228L7 10l2.211364-2.40069z"></path></svg>
+               
+								</div>
+								<!---->
+								<!---->
+								<!---->
+							</div>
+						</fieldset>
+					</div>
+          <div class="col-md-12">
+						<fieldset class="form-group" id="__BVID__99">
+							<legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__99__BV_label_">Expence Category</legend>
+							<div>
+								<div dir="auto" class="v-select vs--single vs--searchable">
+                  <select class="form-control" id="pCategory" name="pCategory" required [(ngModel)]='expenseCategory'>
+                  <!-- <option value="Warehouse" selected>--Warehouse--</option> -->
+                  <option *ngFor="let excat of expenceCategoryData" value="{{excat.id}}">{{excat.name}}</option>
+                </select>
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="10" role="presentation" class="vs__open-indicator"><path d="M9.211364 7.59931l4.48338-4.867229c.407008-.441854.407008-1.158247 0-1.60046l-.73712-.80023c-.407008-.441854-1.066904-.441854-1.474243 0L7 5.198617 2.51662.33139c-.407008-.441853-1.066904-.441853-1.474243 0l-.737121.80023c-.407008.441854-.407008 1.158248 0 1.600461l4.48338 4.867228L7 10l2.211364-2.40069z"></path></svg>
+               
+								</div>
+								<!---->
+								<!---->
+								<!---->
+							</div>
+						</fieldset>
+					</div>
+          <div class="col-sm-12 col-md-6">
+            <button type="button" class="btn btn-primary m-1 btn-block" (click)="getFilteredData($event)"><i
+                class="i-Filter-2"></i> Filter </button>
+          </div>
+          <div class="col-sm-12 col-md-6">
+            <button type="button" class="btn btn-danger m-1 btn-block" (click)="ResetExpenceData($event)"><i
+                class="i-Power-2"></i> Reset </button>
+          </div>
+				</div>
+			</div>
+		</div>
+		<!---->
+	<!---->
+	<!---->
+</ng-template>
+</div>
+    <!---->
+<app-loaders *ngIf="isLoader"></app-loaders>

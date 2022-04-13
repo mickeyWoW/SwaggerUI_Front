@@ -1,0 +1,162 @@
+<div class="breadcrumb">
+  <h1>Profit and Loss</h1>
+  <ul>
+    <li>
+      <a routerLink="/sales" routerLinkActive="router-link-active">Reports</a>
+    </li>
+    <li>Profit and Loss</li>
+  </ul>
+</div>
+
+<div class="separator-breadcrumb border-top"></div>
+
+<div class="row">
+  <div class="col-sm-12 col-md-4">
+    <div class="card card-icon text-center mb-30">
+      <div class="card-body">
+        <i class="i-Data-Upload"></i>
+        <p class="text-muted mt-2 mb-2">
+          <span class="bold">1</span>
+          Sales
+        </p>
+        <p class="text-primary text-24 line-height-1 m-0">
+          {{ salesReport || 0.0 | currency }}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-4 mt-3">
+    <div class="card card-icon text-center mb-30">
+      <div class="card-body">
+        <i class="i-Data-Upload"></i>
+        <p class="text-muted mt-2 mb-2">
+          <span class="bold">1</span>
+          Purchases
+        </p>
+        <p class="text-primary text-24 line-height-1 m-0">
+          {{ paymentPurchases || 0.0 | currency }}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-4 mt-3">
+    <div class="card card-icon text-center mb-30">
+      <div class="card-body">
+        <i class="i-Data-Upload"></i>
+        <p class="text-muted mt-2 mb-2">
+          <span class="bold">1</span>
+          Sales Return
+        </p>
+        <p class="text-primary text-24 line-height-1 m-0">
+          {{ paymentSalesReturns || 0.0 | currency }}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-4 mt-3">
+    <div class="card card-icon text-center mb-30">
+      <div class="card-body">
+        <i class="i-Data-Upload"></i>
+        <p class="text-muted mt-2 mb-2">
+          <span class="bold">1</span>
+          Purchases Return
+        </p>
+        <p class="text-primary text-24 line-height-1 m-0">
+          {{ paymentPurchaseReturns || 0.0 | currency }}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-4 mt-3">
+    <div class="card card-icon text-center mb-30">
+      <div class="card-body">
+        <i class="i-Data-Upload"></i>
+        <p class="text-muted mt-2 mb-2"><span class="bold">Expenses</span></p>
+        <p class="text-primary text-24 line-height-1 m-0">
+          {{ expenses || 0.0 | currency }}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-4 mt-3">
+    <div class="card card-icon text-center mb-30">
+      <div class="card-body">
+        <i class="i-Data-Upload"></i>
+        <p class="text-muted mt-2 mb-2">Profit</p>
+        <p class="text-primary text-24 line-height-1 m-0">
+          {{ salesReport - paymentPurchases || 0.0 | currency }}
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-4 mt-3">
+    <div class="card card-icon text-center mb-30">
+      <div class="card-body">
+        <i class="i-Data-Upload"></i>
+        <p class="text-muted mt-2 mb-2">Paiements Received</p>
+        <p class="text-primary text-24 line-height-1 m-0">
+          {{ salesReport + paymentPurchases || 0.0 | currency }}
+        </p>
+      </div>
+      <div class="card-footer">
+        <p>
+          (
+          <span class="bold">{{ salesReport || 0.0 | currency }}</span>
+          Payments Sales +
+          <span class="bold">{{ paymentPurchases || 0.0 | currency }}</span>
+          Purchases Return)
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-4 mt-3">
+    <div class="card card-icon text-center mb-30">
+      <div class="card-body">
+        <i class="i-Data-Upload"></i>
+        <p class="text-muted mt-2 mb-2">Paiements Sent</p>
+        <p class="text-primary text-24 line-height-1 m-0">
+          {{ paymentPurchases + paymentSalesReturns || 0.0 | currency }}
+        </p>
+      </div>
+      <div class="card-footer">
+        <p>
+          (
+          <span class="bold">{{ paymentPurchases || 0.0 | currency }}</span>
+          Payments Purchases +
+          <span class="bold">{{ paymentSalesReturns || 0.0 | currency }}</span>
+          Sales Return) +
+          <span class="bold">{{ expenses || 0.0 | currency }}</span>
+          Expenses)
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-12 col-md-4 mt-3">
+    <div class="card card-icon text-center mb-30">
+      <div class="card-body">
+        <i class="i-Data-Upload"></i>
+        <p class="text-muted mt-2 mb-2">Paiements Net</p>
+        <p class="text-primary text-24 line-height-1 m-0">
+          {{
+            salesReport +
+              paymentPurchases -
+              (paymentPurchases + paymentSalesReturns) || 0.0 | currency
+          }}
+        </p>
+      </div>
+      <div class="card-footer">
+        <p>
+          (
+          <span class="bold">
+            {{ salesReport + paymentPurchases || 0.0 | currency }}</span
+          >
+          Recieved -
+          <span class="bold">{{
+            paymentPurchases + paymentSalesReturns || 0.0 | currency
+          }}</span>
+          Sent)
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

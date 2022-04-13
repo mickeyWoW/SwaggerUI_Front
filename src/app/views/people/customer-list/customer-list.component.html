@@ -1,0 +1,367 @@
+<div class="breadcrumb">
+  <h1>Customer Management</h1>
+  <ul>
+    <li>
+      <a routerLink="/people/customer" routerLinkActive="router-link-active"
+        >Customer List</a
+      >
+    </li>
+    <li>Customer Management</li>
+  </ul>
+</div>
+
+<div class="separator-breadcrumb border-top"></div>
+<div class="div">
+  <div style="display: flex; justify-content: space-between; width: 100%">
+    <div class="left" style="display: flex">
+      <div class="magnifying-glass"></div>
+      <div class="form-group">
+        <input
+          placeholder="Search this table"
+          class="form-control"
+          style="background: #fff"
+          type="text"
+          [(ngModel)]="search"
+        />
+      </div>
+    </div>
+    <div>
+      <button type="button" class="btn btn-outline-primary m-1"  (click)="open(mymodal)">
+        <i class="i-Filter-2"></i>Filter
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-success m-1"
+        (click)="printPDF()"
+      >
+        <i class="i-File-Copy"></i> PDF
+      </button>
+      <button
+        type="button"
+        class="btn btn-outline-danger m-1"
+        (click)="printExcel()"
+      >
+        <i class="i-File-Excel"></i> EXCEL
+      </button>
+
+      <button type="button" class="btn btn-info">
+        <i class="i-Download" style="margin-right: 7px"></i>Import products
+      </button>
+
+      <button type="button"  class="btn btn-primary m-1">
+        <i class="i-Add"
+          ><span style="position: relative; bottom: 1px; margin-left: 3px"
+            >Create</span
+          ></i
+        >
+      </button>
+    </div>
+  </div>
+</div>
+<div class="vgt-selection-info-row clearfix" style="display:none;">
+  <span>{{deletedCount}} rows selected</span> 
+  <a href=""></a> 
+    <div class="vgt-selection-info-row__actions vgt-pull-right"><div>
+    <button class="btn btn-danger"(click)="DeleteMultipleUser()">Delete</button>
+</div>
+</div>
+</div>
+<table class="table" #table datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+  <thead>
+    <tr>
+      <th scope="col">
+        <input type="checkbox" (change)="checkAll($event.target.checked)" />
+      </th>
+      <th scope="col" class="btn1" style="position: relative">Code</th>
+      <th scope="col" class="btn1" style="position: relative">Name</th>
+      <th scope="col" class="btn1" style="position: relative">Phone</th>
+      <th scope="col" class="btn1" style="position: relative">Email</th>
+      <th scope="col" class="btn1" style="position: relative">Country</th>
+      <th scope="col" class="btn1" style="position: relative">City</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr *ngIf="customers.length === 0">
+      <td colspan="6">
+        <div
+          style="color: #909399; text-align: center"
+          class="vgt-center-align vgt-text-disabled"
+        >
+          No data for table
+        </div>
+      </td>
+    </tr>
+    <tr *ngFor="let customer of customers | filter: search; let i = index">
+      <th scope="col">
+        <input
+          type="checkbox"
+          [name]="customer.name"
+          [id]="customer.id"
+          [checked]="customer.checkbox"
+          (change)="checkSingle(i)"
+        />
+      </th>
+      <td>{{ customer.code }}</td>
+      <td>{{ customer.name }}</td>
+      <td>{{ customer.phone }}</td>
+      <td>{{ customer.email }}</td>
+      <td>{{ customer.country }}</td>
+      <td>{{ customer.city }}</td>
+      <td>
+        <i class="i-Eye text-info text-25" (click)="view(customer);"></i
+        ><i
+          class="i-Edit text-success ml-2 text-25"
+          (click)="edit(customer)"
+        ></i
+        ><i
+          class="i-Close-Window ml-2 text-danger text-25"
+          (click)="delete(customer)"
+        ></i>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="lower" style="display: flex; justify-content: space-between">
+  <div class="left">
+    <label
+      for="vgt-select-rpp-505333257072"
+      style="font-size: 14px; color: #909399"
+      class="footer__row-count__label"
+      >Rows per page:</label
+    >
+    <select
+      id="vgt-select-rpp-505333257072"
+      autocomplete="off"
+      name="perPageSelect"
+      aria-controls="vgt-table"
+      style="
+        background-color: transparent;
+        width: auto;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        height: auto;
+        font-size: 14px;
+        margin-left: 8px;
+        color: #606266;
+        font-weight: 700;
+        -webkit-appearance: auto !important;
+        -moz-appearance: auto !important;
+        appearance: auto !important;
+      "
+      class="footer__row-count__select"
+    >
+      <option value="10">10</option>
+      <option value="20">20</option>
+      <option value="30">30</option>
+      <option value="40">40</option>
+      <option value="50">50</option>
+      <option value="4">All</option>
+    </select>
+  </div>
+  <div class="right">
+    <div class="footer__navigation">
+      <div class="footer__navigation__page-info">
+        <div>1 - 4 of 4</div>
+      </div>
+      <button
+        type="button"
+        aria-controls="vgt-table"
+        class="footer__navigation__page-btn disabled"
+        style="
+          background: 0 0;
+          border: none;
+          text-decoration: none;
+          opacity: 0.5;
+          color: #606266;
+          font-weight: 700;
+          white-space: nowrap;
+          vertical-align: middle;
+        "
+      >
+        <span aria-hidden="true" class="chevron left"></span> <span>prev</span>
+      </button>
+      <button
+        type="button"
+        style="
+          background: 0 0;
+          border: none;
+          text-decoration: none;
+          color: #606266;
+          font-weight: 700;
+          opacity: 0.5;
+          white-space: nowrap;
+          vertical-align: middle;
+        "
+        aria-controls="vgt-table"
+        class="footer__navigation__page-btn disabled"
+      >
+        <span>next</span> <span aria-hidden="true" class="chevron right"></span>
+      </button>
+    </div>
+  </div>
+</div>
+<ng-template #modal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" *ngIf="toggle" id="modal-basic-title">Create</h4>
+    <h4 class="modal-title" *ngIf="!toggle" id="modal-basic-title">Edit</h4>
+
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form">
+      <div class="form-group">
+        <label for="name">Customer Name</label>
+        <input
+          type="text"
+          formControlName="name"
+          class="form-control"
+          id="name"
+        />
+      </div>
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input
+          type="email"
+          formControlName="email"
+          class="form-control"
+          id="email"
+        />
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input
+          type="number"
+          formControlName="phone"
+          class="form-control"
+          id="number"
+        />
+      </div>
+      <div class="form-group">
+        <label for="phone">Country</label>
+        <input
+          type="text"
+          formControlName="country"
+          class="form-control"
+          id="country"
+        />
+      </div>
+      <div class="form-group">
+        <label for="phone">City</label>
+        <input
+          type="text"
+          formControlName="city"
+          class="form-control"
+          id="city"
+        />
+      </div>
+      <div class="form-group">
+        <label for="phone">Address</label>
+        <input
+          type="text"
+          formControlName="adress"
+          class="form-control"
+          id="address"
+        />
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-outline-dark btn-rounded"
+      *ngIf="toggle && !isView"
+      (click)="createCustomer()"
+    >
+      Submit
+    </button>
+    <button
+      type="button"
+      class="btn btn-outline-dark btn-rounded"
+      *ngIf="!toggle && !isView"
+      (click)="updateCustomer()"
+    >
+      Update
+    </button>
+  </div>
+</ng-template>
+<ng-template #details modal let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Customer Details</h4>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <table class="table table-striped">
+      <tbody>
+        <tr>
+          <td>Customer Name</td>
+          <td>{{ customer.name }}</td>
+        </tr>
+        <tr>
+          <td>Email</td>
+          <td>{{ customer.email }}</td>
+        </tr>
+        <tr>
+          <td>Phone</td>
+          <td>{{ customer.phone }}</td>
+        </tr>
+        <tr>
+          <td>Country</td>
+          <td>{{ customer.country }}</td>
+        </tr>
+        <tr>
+          <td>City</td>
+          <td>{{ customer.city }}</td>
+        </tr>
+        <tr>
+          <td>Address</td>
+          <td>{{ customer.adress }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="modal-footer">
+    <button
+      type="button"
+      class="btn btn-outline-dark btn-rounded"
+      (click)="closs()">
+      Ok
+    </button>
+  </div>
+</ng-template>
+
+<div tabindex="-1" class="b-sidebar-outer"><!---->
+  <ng-template #mymodal let-modal>
+  
+  <header class="b-sidebar-header"> <button type="button" class="close" type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+    <span aria-hidden="true"><svg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="x" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi-x b-icon bi"><g><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"></path></g></svg></span>
+  </button><strong id="sidebar-right___title__">Filter</strong></header>
+    <div class="b-sidebar-body">
+      <div class="px-3 py-2"><div class="row"><div class="col-md-12"><fieldset class="form-group" id="__BVID__377"><legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__377__BV_label_">Customer Code</legend><div><input type="text" placeholder="Search by Code" class="form-control" label="Code" id="__BVID__378"><!----><!----><!----></div></fieldset></div> <div class="col-md-12"><fieldset class="form-group" id="__BVID__379"><legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__379__BV_label_">Customer Name</legend><div><input type="text" placeholder="Search by Name" class="form-control" label="Name" id="__BVID__380"><!----><!----><!----></div></fieldset></div> <div class="col-md-12"><fieldset class="form-group" id="__BVID__381"><legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__381__BV_label_">Phone</legend><div><input type="text" placeholder="Search by Phone" class="form-control" label="Phone" id="__BVID__382"><!----><!----><!----></div></fieldset></div> <div class="col-md-12"><fieldset class="form-group" id="__BVID__383"><legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__383__BV_label_">Email</legend><div><input type="text" placeholder="Search By Email" class="form-control" label="Email" id="__BVID__384"><!----><!----><!----></div></fieldset></div> <div class="col-sm-12 col-md-6"><button type="button" class="btn btn-primary m-1 btn-sm btn-block"><i class="i-Filter-2"></i>
+        Filter
+      </button></div> <div class="col-sm-12 col-md-6"><button type="button" class="btn btn-danger m-1 btn-sm btn-block"><i class="i-Power-2"></i>
+        Reset
+      </button></div></div></div>
+    </div>
+    <!---->
+  </ng-template>
+    <!---->
+    <!---->
+    </div>
+
+<app-loaders *ngIf="isLoader"></app-loaders>

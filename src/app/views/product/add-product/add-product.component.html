@@ -1,0 +1,241 @@
+<div class="breadcrumb">
+  <h1>{{ "PRODUCT.TITLE" | translate }}</h1>
+  <ul>
+    <li>
+      <a routerLink="/product" routerLinkActive="router-link-active">Product</a>
+    </li>
+    <li>{{ "PRODUCT.TITLE" | translate }}</li>
+  </ul>
+</div>
+
+<div class="separator-breadcrumb border-top"></div>
+
+<div class="row">
+  <div class="col-md-8">
+    <div class="card mb-4">
+      <div class="card-body">
+        <form [formGroup]="form">
+          <div class="row">
+            <div class="col-md-6 form-group mb-3">
+              <label for="firstName">{{ "PRODUCT.NAME" | translate }}</label>
+              <input type="text" class="form-control" id="firstName" placeholder="Product Name"
+                formControlName="name" />
+              <errors [control]="f.name" [isSubmit]="isSubmitted"></errors>
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="lastName">{{ "PRODUCT.CODE" | translate }}</label>
+              <input type="text" class="form-control" id="lastName" placeholder="Product Code" formControlName="code" />
+              <errors [control]="f.code" [isSubmit]="isSubmitted"></errors>
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="picker1">{{ "PRODUCT.CATEGORY" | translate }}</label>
+
+              <ng-select class="ngSelectCustom" [items]="categories" bindLabel="name" bindValue="id"
+                placeholder="Category" autocomplete="off" formControlName="category_id">
+              </ng-select>
+              <errors [control]="f.category_id" [isSubmit]="isSubmitted"></errors>
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="picker1">{{ "PRODUCT.BRAND" | translate }}</label>
+
+              <ng-select class="ngSelectCustom" [items]="brands" bindLabel="name" bindValue="id" placeholder="Brand"
+                autocomplete="off" formControlName="brand_id"></ng-select>
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="picker1">Barcode Symbology</label>
+              <ng-select class="ngSelectCustom" [items]="barcode_sybmology" bindLabel="name" bindValue="name"
+                placeholder="Select Barcode Type" autocomplete="off" formControlName="type_barcode"></ng-select>
+              <errors [control]="f.type_barcode" [isSubmit]="isSubmitted"></errors>
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="exampleInputEmail1">Product Cost</label>
+              <input type="number" class="form-control" placeholder="Enter Product Cost" formControlName="cost" />
+              <errors [control]="f.cost" [isSubmit]="isSubmitted"></errors>
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="phone">Product Price</label>
+              <input class="form-control" id="phone" placeholder="Product Price" formControlName="price"
+                type="number" />
+              <errors [control]="f.price" [isSubmit]="isSubmitted"></errors>
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="picker1">{{ "PRODUCT.UNIT" | translate }}</label>
+              <ng-select class="ngSelectCustom" [items]="units" bindLabel="name" bindValue="id"
+                placeholder="Product Unit" autocomplete="off" formControlName="unit_id"></ng-select>
+              <errors [control]="f.unit_id" [isSubmit]="isSubmitted"></errors>
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="picker1">{{ "PRODUCT.SALES" | translate }}</label>
+
+              <ng-select class="ngSelectCustom" [items]="units" bindLabel="name" bindValue="id" placeholder="Sales Unit"
+                autocomplete="off" formControlName="unit_sale_id"></ng-select>
+              <errors [control]="f.unit_sale_id" [isSubmit]="isSubmitted"></errors>
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="picker1">Purchase Unit</label>
+
+              <ng-select class="ngSelectCustom" [items]="units" bindLabel="name" bindValue="id"
+                placeholder="Purchase Unit" autocomplete="off" formControlName="unit_purchase_id"></ng-select>
+              <errors [control]="f.unit_purchase_id" [isSubmit]="isSubmitted"></errors>
+            </div>
+            <div class="col-md-6 form-group mb-3">
+              <label for="credit">Stock Alert</label>
+              <input class="form-control" placeholder="Stock Alert" formControlName="stock_alert" />
+            </div>
+
+            <div class="col-md-6 form-group mb-3">
+              <label for="credit">{{ "PRODUCT.TAX" | translate }}</label>
+              <input class="form-control" value="" placeholder="Order Tax" formControlName="taxNet" />
+            </div>
+            <div class="col-md-6 form-group mb-3">
+              <label for="picker1">Tax Type</label>
+              <ng-select class="ngSelectCustom" [items]="taxTypes" bindLabel="name" bindValue="name"
+                placeholder="Tax Type" autocomplete="off" formControlName="tax_method">
+              </ng-select>
+              <errors [control]="f.tax_method" [isSubmit]="isSubmitted"></errors>
+            </div>
+            <div class="mb-2 col-md-12">
+              <fieldset class="form-group" id="__BVID__152">
+                <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__152__BV_label_">
+                  Note
+                </legend>
+                <div>
+                  <textarea rows="4" placeholder="A few words ..." class="form-control"
+                    formControlName="note"></textarea>
+                  <!---->
+                  <!---->
+                  <!---->
+                </div>
+              </fieldset>
+            </div>
+            <div class="col-md-12">
+              <btn-loading btnClass="btn-primary btn-rounded" [loading]="isLoader" (click)="onSubmit()">{{
+                "PRODUCT.SUBMIT" | translate }}</btn-loading>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- <div class="col-md-4">
+    <div
+      class="card"
+      style="display: flex; justify-content: center; align-items: center"
+    >
+      <div
+        class="header"
+        style="
+          background-color: rgba(10, 2, 30, 0.03);
+          padding: 10px;
+          width: -webkit-fill-available;
+          margin-bottom: 20px;
+        "
+      >
+        <h5>{{ "PRODUCT.MULTIPLE_IMAGES" | translate }}</h5>
+      </div>
+      <div
+        class="drop"
+        style="
+          width: 190px;
+          height: 180px;
+          border: 1px dashed #d6d6d6;
+          border-radius: 4px;
+          background-color: #fff;
+          margin: 20px 29px 20px 10px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        "
+      >
+        <input
+          type="file"
+          style="display: none"
+          (change)="patchImage($event)"
+          #file
+          multiple
+        />
+        <p
+          style="
+            padding-top: 5px;
+            color: #777;
+            font-weight: 400;
+            cursor: pointer;
+            line-height: 1.5;
+          "
+          (click)="file.click()"
+        >
+          <img
+            [src]="
+              f.image.value ||
+              'https://icons-for-free.com/iconfiles/png/512/cloud+upload+file+storage+upload+icon-1320190558968694328.png'
+            "
+            alt=""
+            height="100px"
+            width="100px"
+          />
+        </p>
+      </div>
+      <div style="display: flex">
+        <input type="checkbox" />
+        <p style="position: relative; left: 5px">
+          Product has multpile variants
+        </p>
+      </div>
+    </div>
+  </div> -->
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="row">
+
+          <div class="col-md-12">
+
+            <div ng2FileDrop [ngClass]="{'another-file-over-class': hasAnotherDropZoneOver}"
+              (fileOver)="fileOverAnother($event)" [uploader]="uploader" class="well my-drop-zone p-5 mb-3"
+              style="font-size: 29px;text-align: center;">
+              Drop Files Here
+            </div>
+
+            <div class="col-md-12" style="margin-bottom: 40px;overflow: auto;" *ngIf="uploader?.queue?.length">
+
+              <h3>Upload queue</h3>
+              <p>Queue length: {{ uploader?.queue?.length ? uploader?.queue?.length : 'Empty'}}</p>
+
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Image</th>
+                    <th>Name</th>
+                    <th>Size</th>
+                  </tr>
+                </thead>
+                <tbody *ngIf="uploader?.queue?.length">
+                  <tr *ngFor="let item of uploader.queue">
+                    <td><input type="checkbox" [checked]="item?._file?.isMain" (change)="checkChange(item,$event)" />
+                    </td>
+                    <td><img [src]="getImage(item)"></td>
+                    <td data-label="Name"><strong>{{ item?.file?.name }}</strong></td>
+                    <td data-label="Size" *ngIf="uploader.options.isHTML5" nowrap>{{ item?.file?.size/1024/1024 |
+                      number:'.2'
+                      }} MB</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
