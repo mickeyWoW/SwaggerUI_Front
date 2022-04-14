@@ -1,18 +1,23 @@
-import { Component, ElementRef, OnInit, ViewChild } from "@angular/core";
-import { FormControl } from "@angular/forms";
+import { Component, ElementRef, OnInit, OnDestroy, ViewChild } from "@angular/core";
+import { ViewEncapsulation } from '@angular/core';
 import { ModalDismissReasons, NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { FormControl } from "@angular/forms";
+import Swal from "sweetalert2";
+import { DataTableDirective } from 'angular-datatables';
 import { Subject } from "rxjs";
-import { ExcelService } from "../../../core/services/excel.service";
-import { PDFService } from "../../../core/services/pdf.service";
+import * as XLSX from "xlsx";
+
 import { ProductService } from "../../../core/services/product.service";
+import { ExcelService } from "src/app/core/services/excel.service";
+import { PDFService } from "src/app/core/services/pdf.service";
 import { CategoryService } from "../../../core/services/category.service";
 import { BrandService } from "../../../core/services/brand.service";
-import Swal from "sweetalert2";
-import { ViewEncapsulation } from '@angular/core';
-import * as XLSX from "xlsx";
-import { SearchFilter } from '../search.module';
-// import { DataTableDirective } from 'angular-datatables';
 
+import { CategoryPipe } from "src/app/shared/pipes/category.pipe";
+import { BrandPipe } from "src/app/shared/pipes/brand.pipe";
+import { promise } from "protractor";
+
+import { FilterData } from "../product.service";
 
 @Component({
   selector: "app-view-product",
@@ -20,7 +25,11 @@ import { SearchFilter } from '../search.module';
   styleUrls: ["./view-product.component.scss"],
   encapsulation: ViewEncapsulation.None
 })
+
 export class ViewProductComponent implements OnInit {
+
+  @ViewChild(DataTableDirective)
+  dtElement: DataTableDirective;
   dtOptions: DataTables.Settings = {};
   dtTrigger: Subject<any> = new Subject();
 
@@ -28,12 +37,14 @@ export class ViewProductComponent implements OnInit {
   @ViewChild("inputFile") inputFile: ElementRef;
   keys: string[];
   dataSheet = new Subject();
-  search: any;
+  search: FilterData = {} as any;
   closeModal: string;
   searchControl: FormControl = new FormControl();
   products: any = [];
   category: any = [];
   brand: any = [];
+  categoryDict: any = [];
+  brandDict: any = [];
   filteredProducts;
   isLoader = false;
   isExcelFile: boolean;
@@ -46,7 +57,6 @@ export class ViewProductComponent implements OnInit {
   searchCode: string = '';
   searchName: string = '';
   searchCategoryName: string = '';
-  searchdata: SearchFilter = {} as any;
   optionSelected: any;
   selectedBrand: any;
   deletedCount: any = 0;
@@ -78,38 +88,141 @@ export class ViewProductComponent implements OnInit {
     }
   }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     this.dtOptions = {
       pagingType: 'full_numbers',
-      pageLength: 5,
+      pageLength: 10,
       processing: true
     };
 
-    this.getAllProducts();
-    this.onOptionsSelected();
-    this.getAllBrands();
+    await this.getAllProducts();
+    await this.onOptionsSelected();
+    await this.getAllBrands();
+
+    this.initSearch();
+  }
+
+  ngOnDestroy(): void {
+    // We remove the last function in the global ext search array so we do not add the fn each time the component is drawn
+    // /!\ This is not the ideal solution as other components may add other search function in this array, so be careful when
+    // handling this global variable
+    $.fn['dataTable'].ext.search.pop();
+  }
+  
+  initSearch() {
+    // $.fn['dataTable'].ext.search.push((settings, data, dataIndex) => (
+    //   console.log(data) as unknown || true
+    // ));
+    // $.fn['dataTable'].ext.search.push((settings, data, dataIndex) => (
+    //   !this.search || 
+    //   !this.search.length || 
+    //   data[2].toLowerCase().indexOf(this.search.toLowerCase()) !== -1 || 
+    //   data[3].toLowerCase().indexOf(this.search.toLowerCase()) !== -1 || 
+    //   data[4].toLowerCase().indexOf(this.search.toLowerCase()) !== -1 || 
+    //   data[5].toLowerCase().indexOf(this.search.toLowerCase()) !== -1 || 
+    //   data[6].toLowerCase().indexOf(this.search.toLowerCase()) !== -1 || 
+    //   data[7].toLowerCase().indexOf(this.search.toLowerCase()) !== -1
+    // ));
+    console.log(this.search);
+    this.search.search = '';
+    this.search.codeProduct = '';
+    this.search.productName = '';
+    this.search.categoryId = '';
+    this.search.brandId = '';
+  }
+
+  searchData() {
+    // console.log(this.products);
+    // $(this.table.nativeElement).DataTable().search(this.search).draw();
   }
 
   getAllProducts() {
-    this.isLoader = true;
-    this.productService.getAllProducts({ pageNumber: this.pageNumber, pageSize: this.pageSize }).subscribe(
-      (response) => {
-        if (response && response.Products) {
-          this.total = response.Total;
-          this.products = [];
-          this.products = response.Products;
-          this.products.forEach(x => {
-            x.checkbox = false;
-          });
+    return new Promise((resolve, reject) => {
+      const categoryPipe = new CategoryPipe(this.categoryService);
+      const brandPipe = new BrandPipe(this.brandService);
+    
+      this.isLoader = true;
+      this.productService.getAllProducts({ pageNumber: this.pageNumber, pageSize: this.pageSize }).subscribe(
+        (response) => {
+          if (response && response.Products) {
+            console.log("getAllProducts")
+            this.total = response.Total;
+            this.products = [];
+            this.products = response.Products;
+            this.products.forEach(x => {
+              x.checkbox = false;
+            });
+            this.isLoader = false;
+            console.log(this.dtTrigger.next);
+            // this.rerender();
+          }
+          resolve('');
+        },
+        (error) => {
           this.isLoader = false;
-          // this.rerender();
-        }
-      },
-      (error) => {
-        this.isLoader = false;
-        Swal.fire("Error occured while retrieving the list", "", "error");
-      },
-    );
+          Swal.fire("Error occured while retrieving the list", "", "error");
+          reject();
+        },
+      );
+    });
+  }
+
+  onOptionsSelected() {
+    return new Promise((resolve, reject) => {
+      this.categoryService.getAllCategories().subscribe(
+        (response) => {
+          this.category = [];
+          this.categoryDict = [];
+          console.log("onOptionsSelected")
+          if (response) {
+            this.category = response;
+            response.forEach(x => {
+              this.categoryDict[x.id] = x;
+            })
+            this.products.forEach(x => {
+              x.category_name = this.categoryDict[x.category_id] ? this.categoryDict[x.category_id].name : "";
+            });
+          }
+          console.log(response);
+          console.log(this.products);
+          resolve('');
+        },
+        (error) => {
+
+          Swal.fire("Error occured while retrieving the list", "", "error");
+          reject();
+        },
+      );
+    });
+  }
+
+   getAllBrands() {
+    return new Promise((resolve, reject) => {
+      this.brandService.getAllBrands().subscribe(
+        (response) => {
+          this.brand = [];
+          this.brandDict = [];
+          console.log("getAllBrands")
+          if (response) {
+            this.brand = response;
+            response.forEach(x => {
+              this.brandDict[x.id] = x;
+            })
+            this.products.forEach(x => {
+              x.brand_name = this.brandDict[x.brand_id] ? this.brandDict[x.brand_id].name : "";
+            });
+          }
+          console.log(response);
+          this.dtTrigger.next();
+        },
+        (error) => {
+          Swal.fire("Error occured while retrieving the list", "", "error");
+        },
+      );
+    });
+  }
+
+  ngAfterViewInit(): void {
   }
 
   getPrimaryImage(product) {
@@ -241,26 +354,29 @@ export class ViewProductComponent implements OnInit {
     {
       document.body.classList.remove("checkAllbox");
     }
+    this.deletedCount = 0;
     this.products.forEach((x) => {
       x.checkbox = e;
+      this.deletedCount ++;
     });
   }
   
   checkSingle(i) {
-    if(i) {
+    this.products[i].checkbox = !this.products[i].checkbox;
+    this.deletedCount = 0;
+    this.products.forEach((x) => {
+      if(x.checkbox)
+        this.deletedCount ++;
+    });
+
+    console.log(this.deletedCount);
+    if(this.deletedCount) {
       document.body.classList.add("checkAllbox");
     } 
-    else if("")
+    else
     {
       document.body.classList.remove("checkAllbox");
     }
-    this.products[i].checkbox = !this.products[i].checkbox;
-    var totalCount = 0
-    $.each(this.products,function(i,obj) {
-      if(obj.checkbox)
-        totalCount++;
-    });
-    this.deletedCount=totalCount;
   }
 
   getProductList(paging) {
@@ -268,81 +384,30 @@ export class ViewProductComponent implements OnInit {
     this.pageSize = paging.pageSize;
     this.getAllProducts();
   }
+
   getFilteredData() {
-    if (this.products.length > 0) {
-      this.isLoader = true;
-      this.searchdata.searchString = this.searchCode;
-      this.searchdata.searchString = this.searchName;
-       this.optionSelected = this.optionSelected ? this.optionSelected : '';
-        this.selectedBrand = this.selectedBrand ? this.selectedBrand : '';
-
-        this.productService.getProductsByFilters(this.searchCode, this.searchName, this.optionSelected, this.selectedBrand).subscribe(
-          (response) => {
-            if (response) {
-    
-              this.total = response.Total;
-              this.products = [];
-              this.products = response;
-    
-              this.products.forEach(x => {
-                x.checkbox = false;
-              });
-    
-              this.isLoader = false;
-            }
-          },
-          (error) => {
-            this.isLoader = false;
-            Swal.fire("Error occured while retrieving the list", "", "error");
-          },
-        );
-
-    }
-    else if (this.products.length == 0) {
-      this.getAllProducts();
+    this.search = {
+      search: this.search.search, 
+      codeProduct: this.searchCode,
+      productName: this.searchName,
+      categoryId: this.optionSelected,
+      brandId: this.selectedBrand,
     }
   }
+
   ResetProductData() {
 
-    this.searchCode = '';
-    this.searchName = '';
-    this.optionSelected= '';
-    this.selectedBrand = '';
+    this.search = {
+      search: this.search.search, 
+      codeProduct: '',
+      productName: '',
+      categoryId: '',
+      brandId: '',
+    }
     this.modalService.dismissAll();
-    this.getAllProducts();
 
   }
 
-
-  onOptionsSelected() {
-    this.categoryService.getAllCategories().subscribe(
-      (response) => {
-        if (response) {
-          this.category = response;
-        }
-      },
-      (error) => {
-
-        Swal.fire("Error occured while retrieving the list", "", "error");
-      },
-    );
-  }
-
-   getAllBrands() {
-    this.brandService.getAllBrands().subscribe(
-      (response) => {
-        if (response) {
-          this.brand = response;
-        }
-      },
-      (error) => {
-        Swal.fire("Error occured while retrieving the list", "", "error");
-      },
-    );
-  }
-  ngAfterViewInit(): void {
-    this.dtTrigger.next();
-}
 
 // rerender(): void {
 //     this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {

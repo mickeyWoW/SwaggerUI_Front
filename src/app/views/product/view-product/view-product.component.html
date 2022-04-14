@@ -18,7 +18,8 @@
           class="form-control" 
           style="background: #fff" 
           type="text"
-          [(ngModel)]="search" />
+          [(ngModel)]="search.search"
+          (ngModelChange)="searchData()" />
       </div>
     </div>
     <div>
@@ -59,13 +60,14 @@
 <div class="vgt-selection-info-row clearfix" style="display:none;">
   <span>{{deletedCount}} rows selected</span> 
   <a href=""></a> 
-    <div class="vgt-selection-info-row__actions vgt-pull-right"><div>
-    <button class="btn btn-danger"(click)="DeleteMultipleProducts()">Delete</button>
-</div>
-</div>
+  <div class="vgt-selection-info-row__actions vgt-pull-right">
+    <div>
+      <button class="btn btn-danger"(click)="DeleteMultipleProducts()">Delete</button>
+    </div>
+  </div>
 </div>
 
-<table class="table" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
+<table #table class="table" datatable [dtOptions]="dtOptions" [dtTrigger]="dtTrigger">
   <thead>
     <tr>
       <th scope="col">
@@ -107,17 +109,17 @@
         </div>
       </td>
     </tr>
-    <tr *ngFor="let product of products | filter: search; let i = index">
-      <td scope="col">
+    <tr *ngFor="let product of (products | dataTableFilter: search); index as i;">
+      <th scope="col">
         <input type="checkbox" [checked]="product.checkbox" (change)="checkSingle(i)" />
-      </td>
+      </th>
       <td>
         <img [src]="getPrimaryImage(product)" style="height: 50px; width: 50px" alt="no image" />
       </td>
       <td>{{ product.name }}</td>
       <td>{{ product.code }}</td>
-      <td>{{ product.category_id | Category | async }}</td>
-      <td>{{ product.brand_id | Brand | async }}</td>
+      <td>{{ product.category_name }}</td>
+      <td>{{ product.brand_name }}</td>
       <td>{{ product.price }}</td>
       <td>{{ product.unit_id }}</td>
       <td>{{ product.stock_alert }}</td>

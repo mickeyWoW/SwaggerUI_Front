@@ -1,5 +1,4 @@
 import { Pipe, PipeTransform } from "@angular/core";
-import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { CategoryService } from "src/app/core/services/category.service";
 
@@ -15,11 +14,9 @@ export class CategoryPipe implements PipeTransform {
 
     return this.categoryService.getCategoryById(id).pipe(
       map((response) => {
-        console.log(response);
         if(response && response.name)
           return response.name;
-        else 
-          return '';
+        return '';
       }),
     );
   }

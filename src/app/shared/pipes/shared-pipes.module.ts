@@ -12,6 +12,7 @@ import { ExpenseCategoryPipe } from "./expense-category.pipe";
 import { CustomerPipe } from "./customer.pipe";
 import { SupplierPipe } from "./suppliers.pipe";
 import { UnitPipe } from "./unit.pipe";
+import { DataTableFilterPipe } from './data-table-filter.pipe';
 
 const pipes = [
   ExcerptPipe,
@@ -26,6 +27,7 @@ const pipes = [
   CustomerPipe,
   SupplierPipe,
   UnitPipe,
+  DataTableFilterPipe, 
 ];
 
 @NgModule({
