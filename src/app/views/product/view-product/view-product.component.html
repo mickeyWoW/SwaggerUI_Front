@@ -18,7 +18,7 @@
           class="form-control" 
           style="background: #fff" 
           type="text"
-          [(ngModel)]="search.search"
+          [(ngModel)]="search"
           (ngModelChange)="searchData()" />
       </div>
     </div>
@@ -113,10 +113,8 @@
       <th scope="col">
         <input type="checkbox" [checked]="product.checkbox" (change)="checkSingle(i)" />
       </th>
-      <td>
-        <img [src]="getPrimaryImage(product)" style="height: 50px; width: 50px" alt="no image" />
-      </td>
-      <td>{{ product.name }}</td>
+      <td>{{ i + ' ' + product.name }}</td>
+      <td>{{ i + ' ' + product.name }}</td>
       <td>{{ product.code }}</td>
       <td>{{ product.category_name }}</td>
       <td>{{ product.brand_name }}</td>
@@ -156,7 +154,7 @@
               <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__152__BV_label_">Code
                 Product</legend>
               <div>
-                <input type="text" name="search" [(ngModel)]="searchCode" placeholder="Search by Code"
+                <input type="text" name="search" [(ngModel)]="filter.codeProduct" placeholder="Search by Code"
                   class="form-control" label="Code Product" id="__BVID__153">
 
               </div>
@@ -167,7 +165,7 @@
               <legend tabindex="-1" class="bv-no-focus-ring col-form-label pt-0" id="__BVID__154__BV_label_">Product
               </legend>
               <div>
-                <input type="text" name="search" [(ngModel)]="searchName" placeholder="Search by Name"
+                <input type="text" name="search" [(ngModel)]="filter.productName" placeholder="Search by Name"
                   class="form-control" label="Name Product" id="__BVID__155">
                 <!---->
                 <!---->
@@ -181,7 +179,7 @@
               </legend>
               <div>
                 <div dir="auto" class="v-select vs--single vs--searchable">
-                  <select class="form-control" id="pCategory" name="pCategory" required [(ngModel)]='optionSelected'
+                  <select class="form-control" id="pCategory" name="pCategory" required [(ngModel)]='filter.categoryId'
                    >
                     <option *ngFor="let cat of category" value="{{cat.id}}">{{cat.name}}</option>
                   </select>
@@ -201,7 +199,7 @@
               </legend>
              
                 <div dir="auto" class="v-select vs--single vs--searchable">
-                  <select class="form-control" id="pBrand" name="pBrand" [(ngModel)]="selectedBrand">
+                  <select class="form-control" id="pBrand" name="pBrand" [(ngModel)]="filter.brandId">
                     <option *ngFor="let item of brand" value="{{item.id}}">{{item.name}}</option>
                     </select>
                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="10" role="presentation"

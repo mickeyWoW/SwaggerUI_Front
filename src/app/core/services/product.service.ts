@@ -3,6 +3,9 @@ import { Observable } from "rxjs";
 
 import { ApiService } from "./api.service";
 
+import { FilterData } from "src/app/views/product/product.service";
+import { PageNation } from "src/app/shared/utils";
+
 @Injectable()
 export class ProductService {
   constructor(private apiService: ApiService) {}
@@ -32,8 +35,8 @@ export class ProductService {
     return this.apiService.post(`/Products/Filter/?code=${code}`);
   }
 
-  getProductsByFilters(code, product, category, brand): Observable<any> {
-    return this.apiService.post(`/Products/Filter/?code=${code}&product=${product}&category=${category}&brand=${brand}`);
+  getProductsByFilters(filter: FilterData, pagination: PageNation): Observable<any> {
+    return this.apiService.post(`/Products/Filter`, Object.assign(filter, { pagination: pagination }));
   }
   //warehous products
 

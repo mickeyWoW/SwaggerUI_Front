@@ -18,6 +18,7 @@ import { BrandPipe } from "src/app/shared/pipes/brand.pipe";
 import { promise } from "protractor";
 
 import { FilterData } from "../product.service";
+import { PageNation } from "src/app/shared/utils";
 
 @Component({
   selector: "app-view-product",
@@ -37,7 +38,10 @@ export class ViewProductComponent implements OnInit {
   @ViewChild("inputFile") inputFile: ElementRef;
   keys: string[];
   dataSheet = new Subject();
-  search: FilterData = {} as any;
+  search: string;
+  filter: FilterData = {} as any;
+  pagenation: PageNation = {} as any;
+
   closeModal: string;
   searchControl: FormControl = new FormControl();
   products: any = [];
@@ -50,15 +54,11 @@ export class ViewProductComponent implements OnInit {
   isExcelFile: boolean;
 
   total: any;
-  pageSize: any = 5;
+  pageSize: any = 10;
   pageNumber: any = 1;
   closeResult: string = '';
   getData: any[];
-  searchCode: string = '';
-  searchName: string = '';
   searchCategoryName: string = '';
-  optionSelected: any;
-  selectedBrand: any;
   deletedCount: any = 0;
   constructor(
     private productService: ProductService,
@@ -90,16 +90,20 @@ export class ViewProductComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     this.dtOptions = {
-      pagingType: 'full_numbers',
-      pageLength: 10,
+      paging: false, 
+      searching: false, 
+      info: false, 
       processing: true
     };
 
-    await this.getAllProducts();
+    this.initSearch();
+
     await this.onOptionsSelected();
     await this.getAllBrands();
+    await this.getAllProducts();
 
-    this.initSearch();
+    this.dtTrigger.next();
+
   }
 
   ngOnDestroy(): void {
@@ -123,12 +127,11 @@ export class ViewProductComponent implements OnInit {
     //   data[6].toLowerCase().indexOf(this.search.toLowerCase()) !== -1 || 
     //   data[7].toLowerCase().indexOf(this.search.toLowerCase()) !== -1
     // ));
-    console.log(this.search);
-    this.search.search = '';
-    this.search.codeProduct = '';
-    this.search.productName = '';
-    this.search.categoryId = '';
-    this.search.brandId = '';
+    this.search = '';
+    this.filter.codeProduct = '';
+    this.filter.productName = '';
+    this.filter.categoryId = '';
+    this.filter.brandId = '';
   }
 
   searchData() {
@@ -137,34 +140,8 @@ export class ViewProductComponent implements OnInit {
   }
 
   getAllProducts() {
-    return new Promise((resolve, reject) => {
-      const categoryPipe = new CategoryPipe(this.categoryService);
-      const brandPipe = new BrandPipe(this.brandService);
-    
-      this.isLoader = true;
-      this.productService.getAllProducts({ pageNumber: this.pageNumber, pageSize: this.pageSize }).subscribe(
-        (response) => {
-          if (response && response.Products) {
-            console.log("getAllProducts")
-            this.total = response.Total;
-            this.products = [];
-            this.products = response.Products;
-            this.products.forEach(x => {
-              x.checkbox = false;
-            });
-            this.isLoader = false;
-            console.log(this.dtTrigger.next);
-            // this.rerender();
-          }
-          resolve('');
-        },
-        (error) => {
-          this.isLoader = false;
-          Swal.fire("Error occured while retrieving the list", "", "error");
-          reject();
-        },
-      );
-    });
+    console.log('getallProducts');
+    return this.getFilteredData();
   }
 
   onOptionsSelected() {
@@ -179,12 +156,8 @@ export class ViewProductComponent implements OnInit {
             response.forEach(x => {
               this.categoryDict[x.id] = x;
             })
-            this.products.forEach(x => {
-              x.category_name = this.categoryDict[x.category_id] ? this.categoryDict[x.category_id].name : "";
-            });
           }
           console.log(response);
-          console.log(this.products);
           resolve('');
         },
         (error) => {
@@ -208,15 +181,13 @@ export class ViewProductComponent implements OnInit {
             response.forEach(x => {
               this.brandDict[x.id] = x;
             })
-            this.products.forEach(x => {
-              x.brand_name = this.brandDict[x.brand_id] ? this.brandDict[x.brand_id].name : "";
-            });
           }
           console.log(response);
-          this.dtTrigger.next();
+          resolve('');
         },
         (error) => {
           Swal.fire("Error occured while retrieving the list", "", "error");
+          reject();
         },
       );
     });
@@ -382,28 +353,49 @@ export class ViewProductComponent implements OnInit {
   getProductList(paging) {
     this.pageNumber = paging.pageNumber;
     this.pageSize = paging.pageSize;
-    this.getAllProducts();
+    this.getFilteredData();
   }
 
   getFilteredData() {
-    this.search = {
-      search: this.search.search, 
-      codeProduct: this.searchCode,
-      productName: this.searchName,
-      categoryId: this.optionSelected,
-      brandId: this.selectedBrand,
-    }
+    console.log('getFilteredData');
+    return new Promise((resolve, reject) => {
+    
+      this.isLoader = true;
+      
+      this.pagenation.pageNumber = this.pageNumber = "1";
+      this.pagenation.pageSize = this.pageSize;
+
+      this.productService.getProductsByFilters(this.filter, this.pagenation).subscribe(
+        (response) => {
+          console.log(response);
+          if (response && response.Products) {
+            this.total = response.Total;
+            while (this.products.length) {
+              this.products.pop();
+            }
+            this.products = response.Products;
+            this.products.forEach(x => {
+              x.category_name = this.categoryDict[x.category_id] ? this.categoryDict[x.category_id].name : "";
+              x.brand_name = this.brandDict[x.brand_id] ? this.brandDict[x.brand_id].name : "";
+              x.checkbox = false;
+            });
+            this.isLoader = false;
+            //this.dtTrigger.next();
+            // this.rerender();
+          }
+          resolve('');
+        },
+        (error) => {
+          this.isLoader = false;
+          Swal.fire("Error occured while retrieving the list", "", "error");
+          reject();
+        },
+      );
+    });
   }
 
   ResetProductData() {
 
-    this.search = {
-      search: this.search.search, 
-      codeProduct: '',
-      productName: '',
-      categoryId: '',
-      brandId: '',
-    }
     this.modalService.dismissAll();
 
   }
